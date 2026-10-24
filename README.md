@@ -11,14 +11,21 @@ Chrome extension that ports Orca's in-browser element tools to any tab:
 - **Markup** — freeze the viewport and draw on it (pen, highlighter, arrow, rectangle, ellipse,
   text, eraser, undo/redo), then copy the composed PNG.
 
-## Install (unpacked)
+## Install
+
+**From a release:** download `element-grab-<version>-chrome.zip` from
+[Releases](https://github.com/KinderRookie/element-grab/releases), unzip it, then open
+`chrome://extensions`, enable Developer mode, **Load unpacked**, and pick the unzipped folder.
+
+**From source:**
 
 ```sh
 pnpm install
 pnpm build            # → .output/chrome-mv3
 ```
 
-Open `chrome://extensions`, enable Developer mode, **Load unpacked**, pick `.output/chrome-mv3`.
+Then **Load unpacked** `.output/chrome-mv3` (a hidden folder: press `Cmd+Shift+.` in the macOS
+file picker).
 For development, `pnpm dev` opens a Chrome with the extension and reloads on change.
 
 ## Use
@@ -48,4 +55,4 @@ pnpm test:e2e     # Playwright: loads the extension into Chromium against a Reac
 ```
 
 Design: `docs/superpowers/specs/2026-10-24-element-grab-design.md`.
-Ported from Orca (MIT) — see `NOTICE`.
+Ported from [Orca](https://github.com/stablyai/orca) (MIT) — see `NOTICE`. Not affiliated with Orca.

@@ -14,7 +14,7 @@ behavioral and visual parity:
 
 Primary use is personal; the design must stay Chrome Web Store–submittable.
 
-Source of truth for behavior: Orca (`/Users/snagreakim/Devs/orca`, MIT, © 2026 Lovecast Inc.).
+Source of truth for behavior: Orca ([stablyai/orca](https://github.com/stablyai/orca), MIT, © 2026 Lovecast Inc.).
 The repo keeps Orca's copyright notice in `LICENSE` / `NOTICE`.
 
 ### Non-goals

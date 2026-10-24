@@ -1,8 +1,8 @@
 {
   "name": "element-grab",
   "private": true,
-  "version": "0.1.0",
-  "description": "Grab, annotate and mark up page elements — a Chrome port of Orca's browser element tools",
+  "version": "1.0.0",
+  "description": "Grab, annotate and mark up page elements, then copy their context, comments or a marked-up screenshot to paste anywhere.",
   "type": "module",
   "scripts": {
     "dev": "wxt",

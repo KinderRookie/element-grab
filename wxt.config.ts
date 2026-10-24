@@ -11,7 +11,7 @@ export default defineConfig({
   manifest: {
     name: 'Element Grab',
     description:
-      "Grab, annotate and mark up page elements for your coding agent. A Chrome port of Orca's browser element tools.",
+      'Grab, annotate and mark up page elements, then copy their context, comments or a marked-up screenshot to paste anywhere.',
     permissions: ['activeTab', 'scripting', 'storage', 'clipboardWrite'],
     ...(e2e ? { host_permissions: ['<all_urls>'] } : {}),
     action: { default_title: 'Element Grab (Alt+Shift+E)' },
