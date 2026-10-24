@@ -1,0 +1,11 @@
+Element Grab
+Copyright (c) 2026 Element Grab contributors
+
+This project contains code ported from Orca (https://github.com/stablyai/orca),
+licensed under the MIT License:
+
+  Copyright (c) 2026 Lovecast Inc.
+
+The full Orca license text is in LICENSE.orca. Ported files carry a header naming their
+Orca origin; files under src/ui/primitives, src/lib (except clipboard.ts, messages.ts and
+toast.tsx), src/markup and src/shared are copied from Orca with import paths adjusted.

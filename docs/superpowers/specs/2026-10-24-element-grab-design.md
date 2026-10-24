@@ -1,7 +1,7 @@
 # Element Grab — Chrome Extension Design
 
 Date: 2026-10-24
-Status: Design approved in brainstorming; written spec awaiting user review
+Status: Implemented (M1–M3). See "Implementation notes" at the end for deviations.
 
 ## 1. Goal
 
@@ -341,3 +341,27 @@ Chrome's DevTools inspect shortcut.
 4. **M4 — Store readiness:** icons, privacy disclosure (no data leaves the device), store
    listing screenshots, permission justifications (`activeTab`, `scripting`, `storage`,
    `clipboardWrite`, `offscreen`).
+
+## 16. Implementation notes (deviations from the plan above)
+
+- **No offscreen document.** Text copy falls back to `document.execCommand('copy')` in the
+  content script, which the `clipboardWrite` permission allows. Offscreen documents cannot
+  write images to the clipboard, so they would add nothing for PNGs. Image copy needs a secure
+  page; failures show a toast. Permissions are therefore `activeTab`, `scripting`, `storage`
+  and `clipboardWrite`.
+- **Entrypoints.** `src/entrypoints/tools.tsx` (the UI and picker) and `react-probe.ts` (MAIN
+  world) are WXT unlisted scripts. The worker injects them with `chrome.scripting`. The name
+  `content.tsx` is reserved by WXT for manifest content scripts.
+- **UI primitives.** Orca's shadcn/Radix components are copied as-is (`src/ui/primitives`).
+  Their portals target a full-viewport container inside the shadow root via
+  `PortalContainerContext`.
+- **Picker id.** `useGrabMode` gets a constant page id. Keying it by the tab id made the id's
+  async arrival trigger Orca's "tab switched → cancel grab" cleanup.
+- **CSS in the shadow root.** A PostCSS step converts rem to px, un-gates Tailwind's
+  `@property` fallbacks (ignored inside shadow roots), and adds `:host` to `:root` rules.
+- **Parity note.** Like Orca, the HTML snippet is the raw `outerHTML`, including unredacted
+  attribute values. Only the structured `attributes` field is redacted, and the page URL loses
+  its query and hash.
+- **E2E.** `WXT_E2E=1` builds into `.output-e2e` with `<all_urls>` and a worker test hook,
+  because Playwright cannot press the action icon to grant `activeTab`. Release builds have
+  neither.

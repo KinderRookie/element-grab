@@ -1,0 +1,8 @@
+node_modules
+.output
+.wxt
+test-results
+playwright-report
+*.zip
+/.output-e2e
+e2e/fixture/dist
