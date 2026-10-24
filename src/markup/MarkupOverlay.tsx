@@ -71,7 +71,7 @@ export function MarkupOverlay({
         <span className="px-1 text-xs text-muted-foreground">
           {translate(
             'auto.components.browser-pane.markup.hint',
-            'Draw on the page, then copy the markup to paste into your agent.'
+            'Draw on the page, then copy the markup to paste anywhere.'
           )}
         </span>
         <Button type="button" variant="ghost" size="sm" onClick={onCancel} disabled={busy}>

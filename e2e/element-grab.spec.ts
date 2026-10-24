@@ -122,7 +122,7 @@ test('annotate: add, survive reload, copy markdown', async () => {
   const box = (await page.locator('button.btn').boundingBox())!
   await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2)
 
-  const comment = page.getByPlaceholder('Describe what the agent should change here...')
+  const comment = page.getByPlaceholder('Add a comment or question about this element...')
   await expect(comment).toBeVisible()
   await comment.fill('Make this button green')
   await page.getByRole('button', { name: /^Add/ }).click()
