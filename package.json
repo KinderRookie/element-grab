@@ -11,7 +11,8 @@
     "compile": "tsc --noEmit",
     "test": "vitest run",
     "test:e2e": "playwright test",
-    "postinstall": "wxt prepare"
+    "postinstall": "wxt prepare",
+    "screenshots": "playwright test -c playwright.screenshots.config.ts"
   },
   "dependencies": {
     "class-variance-authority": "^0.7.1",

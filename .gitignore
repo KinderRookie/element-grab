@@ -6,3 +6,5 @@ playwright-report
 *.zip
 /.output-e2e
 e2e/fixture/dist
+docs/demo/dist
+docs/superpowers/

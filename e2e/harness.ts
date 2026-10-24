@@ -5,7 +5,7 @@ import path from 'node:path'
 
 const root = path.resolve(import.meta.dirname, '..')
 const extensionPath = path.join(root, '.output-e2e/chrome-mv3')
-const fixtureDir = path.join(root, 'e2e/fixture')
+const defaultFixtureDir = path.join(root, 'e2e/fixture')
 
 export type Harness = {
   context: BrowserContext
@@ -14,7 +14,19 @@ export type Harness = {
   close: () => Promise<void>
 }
 
-export async function startHarness(): Promise<Harness> {
+export type HarnessOptions = {
+  /** Directory served at the root URL. */
+  fixtureDir?: string
+  /** 0 picks a free port; a fixed one keeps page URLs stable (README screenshots). */
+  port?: number
+  deviceScaleFactor?: number
+}
+
+export async function startHarness({
+  fixtureDir = defaultFixtureDir,
+  port: requestedPort = 0,
+  deviceScaleFactor
+}: HarnessOptions = {}): Promise<Harness> {
   const server: Server = createServer(async (req, res) => {
     const url = new URL(req.url ?? '/', 'http://localhost')
     const file = url.pathname === '/' ? '/index.html' : url.pathname
@@ -29,7 +41,7 @@ export async function startHarness(): Promise<Harness> {
       res.end('not found')
     }
   })
-  await new Promise<void>((resolve) => server.listen(0, '127.0.0.1', resolve))
+  await new Promise<void>((resolve) => server.listen(requestedPort, '127.0.0.1', resolve))
   const address = server.address()
   const port = typeof address === 'object' && address ? address.port : 0
 
@@ -37,6 +49,7 @@ export async function startHarness(): Promise<Harness> {
     channel: 'chromium',
     headless: true,
     viewport: { width: 1200, height: 800 },
+    deviceScaleFactor,
     permissions: ['clipboard-read', 'clipboard-write'],
     args: [`--disable-extensions-except=${extensionPath}`, `--load-extension=${extensionPath}`]
   })
