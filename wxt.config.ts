@@ -14,7 +14,10 @@ export default defineConfig({
       'Grab, annotate and mark up page elements, then copy their context, comments or a marked-up screenshot to paste anywhere.',
     permissions: ['activeTab', 'scripting', 'storage', 'clipboardWrite'],
     ...(e2e ? { host_permissions: ['<all_urls>'] } : {}),
-    action: { default_title: 'Element Grab (Alt+Shift+E)' },
+    action: {
+      default_title: 'Element Grab (Alt+Shift+E)',
+      default_icon: { 16: 'icon/16.png', 32: 'icon/32.png' }
+    },
     commands: {
       _execute_action: {
         suggested_key: { default: 'Alt+Shift+E' },
