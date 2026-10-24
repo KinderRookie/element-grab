@@ -2,8 +2,13 @@
 // the manifest. Owns the whole tool UI for this tab until the page navigates or reloads.
 import { createRoot } from 'react-dom/client'
 import { App, type AppController } from '@/ui/App'
-import { registerOwnHost } from '@/grab/own-ui'
-import type { ContentMessage, ElementGrabCommand } from '@/lib/messages'
+import { registerOwnHost, setUiHost } from '@/grab/own-ui'
+import { browserApi } from '@/grab/browser-api'
+import {
+  ELEMENT_GRAB_DISPOSE_EVENT,
+  type ContentMessage,
+  type ElementGrabCommand
+} from '@/lib/messages'
 import css from '@/styles/ui.css?inline'
 
 declare global {
@@ -31,7 +36,15 @@ export default defineUnlistedScript(() => {
     }
   }
 
-  chrome.runtime.onMessage.addListener((message: ContentMessage) => {
+  const onMessage = (
+    message: ContentMessage,
+    _sender: chrome.runtime.MessageSender,
+    sendResponse: (response: unknown) => void
+  ): void => {
+    if (message?.type === 'element-grab:ping') {
+      sendResponse(true)
+      return
+    }
     if (message?.type !== 'element-grab:command') {
       return
     }
@@ -42,7 +55,8 @@ export default defineUnlistedScript(() => {
     for (const handler of handlers) {
       handler(message.command)
     }
-  })
+  }
+  chrome.runtime.onMessage.addListener(onMessage)
 
   const host = document.createElement('element-grab-ui')
   host.style.cssText =
@@ -61,5 +75,25 @@ export default defineUnlistedScript(() => {
   }
 
   document.documentElement.appendChild(host)
-  createRoot(mount).render(<App controller={controller} />)
+  setUiHost(host)
+  const root = createRoot(mount)
+  root.render(<App controller={controller} />)
+
+  // After the extension reloads or updates, this script is orphaned: its chrome.runtime is dead
+  // but its DOM and listeners live on. The new service worker dispatches this event (DOM events
+  // reach every world) before injecting a fresh copy, so the orphan removes itself.
+  const dispose = (): void => {
+    document.removeEventListener(ELEMENT_GRAB_DISPOSE_EVENT, dispose)
+    try {
+      chrome.runtime.onMessage.removeListener(onMessage)
+    } catch {
+      // The runtime of an orphaned script may already be gone.
+    }
+    void browserApi.cancelGrab()
+    root.unmount()
+    host.remove()
+    setUiHost(null)
+    delete window.__elementGrab
+  }
+  document.addEventListener(ELEMENT_GRAB_DISPOSE_EVENT, dispose)
 })

@@ -4,6 +4,7 @@
 //  - wrapped in installPicker() and returns the picker API instead of writing window.__orcaGrab
 //  - React fiber reads go through bridge.getReactMetadata (they need the page's MAIN world)
 //  - hit-testing ignores the extension's own UI via bridge.isOwnElement
+//  - the caller re-slots the host before the extension UI host (see browser-api.ts)
 //  - host id / selection marker attribute renamed
 /* eslint-disable */
 // @ts-nocheck
@@ -589,7 +590,7 @@ export function installPicker(bridge) {
   // Catch selection clicks in the overlay so the page does not receive them.
   var host = document.createElement('div');
   host.id = '__element-grab-host';
-  host.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:2147483646;pointer-events:all;cursor:crosshair;';
+  host.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:2147483647;pointer-events:all;cursor:crosshair;';
   document.documentElement.appendChild(host);
 
   var shadow = host.attachShadow({ mode: 'closed' });

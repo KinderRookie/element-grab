@@ -160,3 +160,48 @@ test('markup: draw a rectangle and copy the composed screenshot', async () => {
   expect(size).not.toBeNull()
   expect(size!.width).toBeGreaterThan(0)
 })
+
+test('grab: picker wins over page widgets that also max out z-index', async () => {
+  await invoke(harness, page, 'grab')
+  await hover(page, '#widget')
+  const box = (await page.locator('#widget').boundingBox())!
+  await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2)
+  await expect(page.getByText('Copied', { exact: true })).toBeVisible()
+  const text = await readClipboardText(page)
+  expect(text).toContain('Selector: div#widget')
+  expect(text).toContain('Text content:\nChat widget')
+})
+
+// Playwright's Chromium does not bring an unpacked extension back after chrome.runtime.reload(),
+// so the two halves of the reload story are exercised separately.
+test('stale DOM from a previous extension instance is replaced on invoke', async () => {
+  // What an orphaned copy leaves behind: its hosts, but no listener answering the worker's ping.
+  await page.evaluate(() => {
+    document.documentElement.appendChild(document.createElement('element-grab-ui'))
+    const host = document.createElement('div')
+    host.id = '__element-grab-host'
+    host.style.cssText = 'position:fixed;inset:0;z-index:2147483647;'
+    document.documentElement.appendChild(host)
+  })
+  await invoke(harness, page, 'grab')
+  await expect(page.locator('element-grab-ui')).toHaveCount(1)
+  await expect(toolbar()).toBeVisible()
+  await hover(page, '#para')
+  await page.keyboard.press('c')
+  await expect(page.getByText('Copied', { exact: true })).toBeVisible()
+  expect(await readClipboardText(page)).toContain('Some paragraph text here.')
+})
+
+test('the dispose event tears a copy down and a re-invoke starts fresh', async () => {
+  await invoke(harness, page, 'grab')
+  await expect(toolbar()).toBeVisible()
+  await page.evaluate(() => document.dispatchEvent(new CustomEvent('element-grab:dispose')))
+  await expect(page.locator('element-grab-ui')).toHaveCount(0)
+  expect(await page.evaluate(() => !!document.getElementById('__element-grab-host'))).toBe(false)
+
+  await invoke(harness, page, 'grab')
+  await expect(page.locator('element-grab-ui')).toHaveCount(1)
+  await hover(page, 'button.btn')
+  await page.keyboard.press('c')
+  await expect(page.getByText('Copied', { exact: true })).toBeVisible()
+})

@@ -14,7 +14,7 @@ import type {
 import { clampGrabPayload } from './browser-grab-payload'
 import { installPicker, type PickerApi } from './picker-core'
 import { getReactMetadataViaMainWorld } from './react-bridge'
-import { isOwnElement, registerOwnHost } from './own-ui'
+import { getUiHost, isOwnElement, registerOwnHost } from './own-ui'
 import { captureSelectionScreenshot } from './screenshot'
 
 let picker: PickerApi | null = null
@@ -60,6 +60,13 @@ export const browserApi = {
         isOwnElement
       })
       unregisterPickerHost = registerOwnHost(picker.host)
+      // Both hosts sit at the maximum z-index, like Orca's picker, so tree order breaks ties:
+      // after <body> the picker beats page widgets that also max out z-index, and before the
+      // UI host it leaves the toolbar clickable while armed.
+      const uiHost = getUiHost()
+      if (uiHost?.parentNode === picker.host.parentNode) {
+        uiHost.before(picker.host)
+      }
       return { ok: true }
     } catch {
       picker = null

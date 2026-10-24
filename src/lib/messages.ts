@@ -3,7 +3,12 @@ import type { BrowserPageAnnotation } from '@/shared/browser-grab-types'
 /** Commands the service worker forwards to the injected content script. */
 export type ElementGrabCommand = 'toggle' | 'grab' | 'annotate' | 'markup'
 
-export type ContentMessage = { type: 'element-grab:command'; command: ElementGrabCommand }
+export type ContentMessage =
+  | { type: 'element-grab:command'; command: ElementGrabCommand }
+  | { type: 'element-grab:ping' }
+
+/** Dispatched on document to make an orphaned (pre-reload) content script remove itself. */
+export const ELEMENT_GRAB_DISPOSE_EVENT = 'element-grab:dispose'
 
 /** Requests the content script sends to the service worker (tab id comes from the sender). */
 export type BackgroundRequest =

@@ -365,3 +365,12 @@ Chrome's DevTools inspect shortcut.
 - **E2E.** `WXT_E2E=1` builds into `.output-e2e` with `<all_urls>` and a worker test hook,
   because Playwright cannot press the action icon to grant `activeTab`. Release builds have
   neither.
+- **Picker stacking.** The picker host keeps Orca's maximum z-index and is inserted just before
+  the UI host. Tree order then puts it above page widgets that also use the maximum z-index,
+  and below the toolbar.
+- **Extension reload.** The worker pings the tab before trusting an existing injection. If
+  nothing answers, it dispatches `element-grab:dispose` (orphaned copies remove themselves),
+  deletes leftover hosts, and injects fresh.
+- **Parity test.** `e2e/orca-parity.spec.ts` bundles Orca's own ARM script, payload clamp and
+  text formatter from the Orca checkout (`ORCA_DIR`, default `../orca`). It asserts that the
+  extension's clipboard text is byte-identical for six fixture elements.

@@ -1,5 +1,6 @@
 // Service worker: injects the tools on demand (activeTab), captures the visible tab for
 // screenshots, and owns per-tab annotation storage. All UI state lives in the content script.
+import { ELEMENT_GRAB_DISPOSE_EVENT } from '@/lib/messages'
 import type {
   AnnotationsResponse,
   BackgroundRequest,
@@ -36,12 +37,29 @@ function captureVisibleTab(windowId: number): Promise<CaptureVisibleTabResponse>
   return result
 }
 
+/**
+ * True when a live copy of the tools answers in this tab. A copy left behind by a previous
+ * extension instance (reload/update) cannot answer, so it is told to dispose itself and any
+ * DOM it left is removed before a fresh injection.
+ */
 async function isInjected(tabId: number): Promise<boolean> {
-  const [result] = await chrome.scripting.executeScript({
+  try {
+    if ((await chrome.tabs.sendMessage(tabId, { type: 'element-grab:ping' })) === true) {
+      return true
+    }
+  } catch {
+    // No receiver: never injected, or only an orphan from a previous extension instance.
+  }
+  await chrome.scripting.executeScript({
     target: { tabId },
-    func: () => !!(window as { __elementGrab?: unknown }).__elementGrab
+    args: [ELEMENT_GRAB_DISPOSE_EVENT],
+    func: (disposeEvent: string) => {
+      document.dispatchEvent(new CustomEvent(disposeEvent))
+      document.querySelectorAll('element-grab-ui, #__element-grab-host').forEach((node) => node.remove())
+      delete (window as { __elementGrab?: unknown }).__elementGrab
+    }
   })
-  return result?.result === true
+  return false
 }
 
 async function invoke(tab: chrome.tabs.Tab | undefined, command: ElementGrabCommand): Promise<void> {

@@ -23,6 +23,28 @@ function App(): React.JSX.Element {
       <h1>Element Grab fixture</h1>
       <Toolbar />
       <p id="para">Some paragraph text here.</p>
+      <ul className="list">
+        <li>First item</li>
+        <li>Second item</li>
+        <li>Third item</li>
+      </ul>
+      <span className="aB3dEfGh9iJkLm label">Hashy class</span>
+      <div
+        id="widget"
+        className="chat-widget"
+        style={{
+          position: 'fixed',
+          left: 16,
+          bottom: 16,
+          zIndex: 2147483647,
+          padding: '10px 14px',
+          background: '#111',
+          color: '#fff',
+          borderRadius: 12
+        }}
+      >
+        Chat widget
+      </div>
       <div style={{ height: 1600 }} />
     </main>
   )

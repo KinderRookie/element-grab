@@ -172,7 +172,7 @@ export function App({ controller }: { controller: AppController }): React.JSX.El
       activeIntent: grabIsInteractive ? grabIntent : null,
       onStartIntent: startGrabIntent,
       disabled: markup.isActive,
-      grabShortcutLabel: shortcuts.grab || 'C',
+      grabShortcutLabel: shortcuts.grab ?? '',
       annotateShortcutLabel: shortcuts.annotate,
       annotationCount: annotations.browserAnnotations.length
     }),

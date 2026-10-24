@@ -1,6 +1,16 @@
 // Tracks the extension's own shadow hosts so the picker never targets them and screenshots
 // never include them (Orca hides its overlays the same way before capturePage()).
 const hosts = new Set<HTMLElement>()
+let uiHost: HTMLElement | null = null
+
+/** The toolbar/overlay host; the picker host is slotted just before it in tree order. */
+export function setUiHost(host: HTMLElement | null): void {
+  uiHost = host
+}
+
+export function getUiHost(): HTMLElement | null {
+  return uiHost
+}
 
 export function registerOwnHost(host: HTMLElement): () => void {
   hosts.add(host)

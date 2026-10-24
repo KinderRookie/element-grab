@@ -12,6 +12,7 @@ export type BrowserChromeElementTools = {
   activeIntent: GrabIntent | null
   onStartIntent: (intent: GrabIntent) => void
   disabled: boolean
+  /** Empty when no Chrome command is bound; the tooltip then omits the parenthetical. */
   grabShortcutLabel: string
   /** Omitted where the annotate chord isn't wired (the workspace doc preview). */
   annotateShortcutLabel?: string
@@ -58,11 +59,13 @@ export function BrowserChromeElementToolButtons({
             </span>
           </TooltipTrigger>
           <TooltipContent side="bottom" sideOffset={4}>
-            {translate(
-              'auto.components.browser.pane.BrowserPane.acbe79fd01',
-              'Grab page element ({{value0}})',
-              { value0: tools.grabShortcutLabel }
-            )}
+            {tools.grabShortcutLabel
+              ? translate(
+                  'auto.components.browser.pane.BrowserPane.acbe79fd01',
+                  'Grab page element ({{value0}})',
+                  { value0: tools.grabShortcutLabel }
+                )
+              : translate('auto.components.browser.pane.BrowserPane.fdfc7fe0ef', 'Grab page element')}
           </TooltipContent>
         </Tooltip>
       ) : null}
